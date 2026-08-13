@@ -1,11 +1,12 @@
 "use client";
 
 import {
-  MessageSquareIcon,
   PanelLeftIcon,
   PenSquareIcon,
   TrashIcon,
+  BotIcon,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { User } from "next-auth";
@@ -18,6 +19,9 @@ import {
   SidebarHistory,
 } from "@/components/chat/sidebar-history";
 import { SidebarUserNav } from "@/components/chat/sidebar-user-nav";
+import { VelcoraModesSelector } from "@/components/chat/velcora-mode-selector";
+import { useActiveChat } from "@/hooks/use-active-chat";
+import { defaultMode, getModeById, type VelcoraMode } from "@/lib/ai/modes";
 import {
   Sidebar,
   SidebarContent,
@@ -49,6 +53,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
   const { setOpenMobile, toggleSidebar } = useSidebar();
   const { mutate } = useSWRConfig();
   const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false);
+  const { activeMode, setActiveMode } = useActiveChat();
 
   const closeMobile = useCallback(() => {
     setOpenMobile(false);
@@ -91,10 +96,16 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                 <SidebarMenuButton
                   asChild
                   className="size-8 !px-0 items-center justify-center group-data-[collapsible=icon]:group-hover/logo:opacity-0"
-                  tooltip="Chatbot"
+                  tooltip="Velcora AI Agent"
                 >
                   <Link href="/" onClick={closeMobile}>
-                    <MessageSquareIcon className="size-4 text-sidebar-foreground/50" />
+                    <Image
+                      alt="Velcora"
+                      className="size-6 rounded-lg object-contain"
+                      height={24}
+                      src="/velcora-logo.png"
+                      width={24}
+                    />
                   </Link>
                 </SidebarMenuButton>
                 <Tooltip>
@@ -111,7 +122,8 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                   </TooltipContent>
                 </Tooltip>
               </div>
-              <div className="group-data-[collapsible=icon]:hidden">
+              <div className="group-data-[collapsible=icon]:hidden flex items-center gap-2">
+                <span className="text-[11px] font-bold tracking-widest uppercase text-sidebar-foreground/30">Velcora</span>
                 <SidebarTrigger className="text-sidebar-foreground/60 transition-colors duration-150 hover:text-sidebar-foreground" />
               </div>
             </SidebarMenuItem>
@@ -144,6 +156,14 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                   </SidebarMenuItem>
                 ) : null}
               </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          <SidebarGroup className="px-3 pb-2 group-data-[collapsible=icon]:hidden">
+            <SidebarGroupContent>
+              <VelcoraModesSelector
+                activeMode={activeMode}
+                onModeChange={setActiveMode}
+              />
             </SidebarGroupContent>
           </SidebarGroup>
           <SidebarHistory user={user} />

@@ -22,6 +22,7 @@ import { getChatHistoryPaginationKey } from "@/components/chat/sidebar-history";
 import { toast } from "@/components/chat/toast";
 import type { VisibilityType } from "@/components/chat/visibility-selector";
 import { useAutoResume } from "@/hooks/use-auto-resume";
+import { defaultMode, type VelcoraMode } from "@/lib/ai/modes";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
 import type { Vote } from "@/lib/db/schema";
 import { ChatbotError } from "@/lib/errors";
@@ -47,6 +48,8 @@ type ActiveChatContextValue = {
   setCurrentModelId: (id: string) => void;
   showCreditCardAlert: boolean;
   setShowCreditCardAlert: Dispatch<SetStateAction<boolean>>;
+  activeMode: VelcoraMode;
+  setActiveMode: Dispatch<SetStateAction<VelcoraMode>>;
 };
 
 const ActiveChatContext = createContext<ActiveChatContextValue | null>(null);
@@ -81,6 +84,11 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
 
   const [input, setInput] = useState("");
   const [showCreditCardAlert, setShowCreditCardAlert] = useState(false);
+  const [activeMode, setActiveMode] = useState<VelcoraMode>(defaultMode);
+  const activeModeRef = useRef(activeMode);
+  useEffect(() => {
+    activeModeRef.current = activeMode;
+  }, [activeMode]);
 
   const { data: chatData, isLoading } = useSWR(
     isNewChat
@@ -168,6 +176,7 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
               : { message: lastMessage }),
             selectedChatModel: currentModelIdRef.current,
             selectedVisibilityType: visibility,
+            selectedMode: activeModeRef.current.id,
             ...request.body,
           },
         };
@@ -274,6 +283,8 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
       stop,
       visibilityType: visibility,
       votes,
+      activeMode,
+      setActiveMode,
     }),
     [
       chatId,
@@ -292,6 +303,7 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
       votes,
       currentModelId,
       showCreditCardAlert,
+      activeMode,
     ]
   );
 

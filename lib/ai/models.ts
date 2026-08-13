@@ -1,4 +1,4 @@
-export const DEFAULT_CHAT_MODEL = "moonshotai/kimi-k2.5";
+export const DEFAULT_CHAT_MODEL = "google/gemini-2.5-flash";
 
 export const titleModel = {
   description: "Fast model for title generation",
@@ -30,6 +30,12 @@ export const chatModels: ChatModel[] = [
     id: "deepseek/deepseek-v3.2",
     name: "DeepSeek V3.2",
     provider: "deepseek",
+  },
+  {
+    description: "Google's fast, capable, and multimodal model",
+    id: "google/gemini-2.5-flash",
+    name: "Gemini 2.5 Flash",
+    provider: "google",
   },
   {
     description: "Moonshot AI flagship model",
@@ -68,6 +74,17 @@ export async function getCapabilities(): Promise<
 > {
   const results = await Promise.all(
     chatModels.map(async (model) => {
+      if (model.provider === "google") {
+        return [
+          model.id,
+          {
+            reasoning: false,
+            tools: true,
+            vision: true,
+          },
+        ];
+      }
+
       try {
         const res = await fetch(
           `https://ai-gateway.vercel.sh/v1/models/${model.id}/endpoints`,
