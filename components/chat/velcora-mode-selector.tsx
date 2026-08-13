@@ -1,23 +1,17 @@
 "use client";
 
-import {
-  Briefcase,
-  FileText,
-  Mail,
-  Search,
-  UserCheck,
-} from "lucide-react";
 import { motion } from "framer-motion";
+import { Briefcase, FileText, Mail, Search, UserCheck } from "lucide-react";
 import { useCallback } from "react";
-import { velcoraModes, type VelcoraMode } from "@/lib/ai/modes";
+import { type VelcoraMode, velcoraModes } from "@/lib/ai/modes";
 import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  UserCheck,
-  Mail,
-  FileText,
-  Search,
   Briefcase,
+  FileText,
+  Mail,
+  Search,
+  UserCheck,
 };
 
 type VelcoraModeCardProps = {
@@ -73,9 +67,9 @@ function VelcoraModeCard({ mode, isActive, onSelect }: VelcoraModeCardProps) {
             {mode.description}
           </p>
         </div>
-        {isActive && (
+        {isActive ? (
           <div className="size-1.5 shrink-0 rounded-full bg-violet-400 animate-pulse" />
-        )}
+        ) : null}
       </div>
     </motion.button>
   );

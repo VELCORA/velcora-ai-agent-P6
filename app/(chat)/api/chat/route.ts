@@ -20,9 +20,9 @@ import {
   getCapabilities,
   getModelAvailability,
 } from "@/lib/ai/models";
+import { getModeById } from "@/lib/ai/modes";
 import { type RequestHints, systemPrompt } from "@/lib/ai/prompts";
 import { getLanguageModel } from "@/lib/ai/providers";
-import { getModeById } from "@/lib/ai/modes";
 import { createDocument } from "@/lib/ai/tools/create-document";
 import { editDocument } from "@/lib/ai/tools/edit-document";
 import { getWeather } from "@/lib/ai/tools/get-weather";
@@ -79,8 +79,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { id, message, messages, selectedChatModel, selectedVisibilityType, selectedMode } =
-      requestBody;
+    const {
+      id,
+      message,
+      messages,
+      selectedChatModel,
+      selectedVisibilityType,
+      selectedMode,
+    } = requestBody;
 
     const [botIdResult, session] = await Promise.all([
       checkBotId().catch(() => null),
@@ -200,7 +206,7 @@ export async function POST(request: Request) {
     const capabilities = modelCapabilities[chatModel];
     const isReasoningModel = capabilities?.reasoning === true;
     const supportsTools = capabilities?.tools === true;
-    
+
     const activeVelcoraMode = getModeById(selectedMode || "");
     const modeSystemPrompt = activeVelcoraMode.systemPrompt;
 
@@ -281,7 +287,11 @@ export async function POST(request: Request) {
                   "updateDocument",
                   "requestSuggestions",
                 ],
-          instructions: systemPrompt({ requestHints, supportsTools, modeSystemPrompt }),
+          instructions: systemPrompt({
+            modeSystemPrompt,
+            requestHints,
+            supportsTools,
+          }),
           messages: modelMessages,
           model: getLanguageModel(chatModel),
           onAbort() {

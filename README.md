@@ -16,6 +16,21 @@
 </p>
 <br/>
 
+> **Velcora AI Agent** — rebranded AI chatbot starter (Vercel AI SDK) customized for Velcora.
+> Workflow modes (sales / marketing / R&D / recruiting / support) are defined in `lib/ai/modes.ts`.
+
+### Environment Variables (required for deploy)
+
+| Variable | Purpose |
+| --- | --- |
+| `POSTGRES_URL` | Neon Postgres connection string — DB migrate + runtime. **Required.** |
+| `REDIS_URL` | Upstash Redis for rate limiting |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob for file uploads |
+| `AUTH_SECRET` | Auth.js session secret |
+| `AI_GATEWAY_API_KEY` | Vercel AI Gateway key (non-Vercel only; auto via OIDC on Vercel) |
+
+Set these in the Vercel project dashboard **before** the first build (the build runs `tsx lib/db/migrate`, which needs `POSTGRES_URL`).
+
 ## Features
 
 - [Next.js](https://nextjs.org) App Router

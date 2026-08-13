@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  PanelLeftIcon,
-  PenSquareIcon,
-  TrashIcon,
-  BotIcon,
-} from "lucide-react";
+import { PanelLeftIcon, PenSquareIcon, TrashIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -20,8 +15,6 @@ import {
 } from "@/components/chat/sidebar-history";
 import { SidebarUserNav } from "@/components/chat/sidebar-user-nav";
 import { VelcoraModesSelector } from "@/components/chat/velcora-mode-selector";
-import { useActiveChat } from "@/hooks/use-active-chat";
-import { defaultMode, getModeById, type VelcoraMode } from "@/lib/ai/modes";
 import {
   Sidebar,
   SidebarContent,
@@ -36,6 +29,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useActiveChat } from "@/hooks/use-active-chat";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -123,7 +117,9 @@ export function AppSidebar({ user }: { user: User | undefined }) {
                 </Tooltip>
               </div>
               <div className="group-data-[collapsible=icon]:hidden flex items-center gap-2">
-                <span className="text-[11px] font-bold tracking-widest uppercase text-sidebar-foreground/30">Velcora</span>
+                <span className="text-[11px] font-bold tracking-widest uppercase text-sidebar-foreground/30">
+                  Velcora
+                </span>
                 <SidebarTrigger className="text-sidebar-foreground/60 transition-colors duration-150 hover:text-sidebar-foreground" />
               </div>
             </SidebarMenuItem>

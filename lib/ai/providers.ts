@@ -1,5 +1,5 @@
-import { customProvider, gateway } from "ai";
 import { google } from "@ai-sdk/google";
+import { customProvider, gateway } from "ai";
 import { isTestEnvironment } from "../constants";
 import { titleModel } from "./models";
 
@@ -35,8 +35,11 @@ export function getTitleModel() {
   if (isTestEnvironment && myProvider) {
     return myProvider.languageModel("title-model");
   }
-  
-  if (titleModel.id.startsWith("google/") || titleModel.id.startsWith("models/")) {
+
+  if (
+    titleModel.id.startsWith("google/") ||
+    titleModel.id.startsWith("models/")
+  ) {
     const strippedId = titleModel.id.replace("google/", "");
     return google(strippedId);
   }

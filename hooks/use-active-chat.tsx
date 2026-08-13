@@ -22,8 +22,8 @@ import { getChatHistoryPaginationKey } from "@/components/chat/sidebar-history";
 import { toast } from "@/components/chat/toast";
 import type { VisibilityType } from "@/components/chat/visibility-selector";
 import { useAutoResume } from "@/hooks/use-auto-resume";
-import { defaultMode, type VelcoraMode } from "@/lib/ai/modes";
 import { DEFAULT_CHAT_MODEL } from "@/lib/ai/models";
+import { defaultMode, type VelcoraMode } from "@/lib/ai/modes";
 import type { Vote } from "@/lib/db/schema";
 import { ChatbotError } from "@/lib/errors";
 import type { ChatMessage } from "@/lib/types";
@@ -175,8 +175,8 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
               ? { messages: request.messages }
               : { message: lastMessage }),
             selectedChatModel: currentModelIdRef.current,
-            selectedVisibilityType: visibility,
             selectedMode: activeModeRef.current.id,
+            selectedVisibilityType: visibility,
             ...request.body,
           },
         };
@@ -265,6 +265,7 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<ActiveChatContextValue>(
     () => ({
+      activeMode,
       addToolApprovalResponse,
       chatId,
       currentModelId,
@@ -274,6 +275,7 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
       messages,
       regenerate,
       sendMessage,
+      setActiveMode,
       setCurrentModelId,
       setInput,
       setMessages,
@@ -283,8 +285,6 @@ export function ActiveChatProvider({ children }: { children: ReactNode }) {
       stop,
       visibilityType: visibility,
       votes,
-      activeMode,
-      setActiveMode,
     }),
     [
       chatId,
