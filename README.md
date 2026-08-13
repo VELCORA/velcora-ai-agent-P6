@@ -24,10 +24,11 @@
 | Variable | Purpose |
 | --- | --- |
 | `POSTGRES_URL` | Neon Postgres connection string — DB migrate + runtime. **Required.** |
-| `REDIS_URL` | Upstash Redis for rate limiting |
-| `BLOB_READ_WRITE_TOKEN` | Vercel Blob for file uploads |
-| `AUTH_SECRET` | Auth.js session secret |
-| `AI_GATEWAY_API_KEY` | Vercel AI Gateway key (non-Vercel only; auto via OIDC on Vercel) |
+| `REDIS_URL` | **Upstash Redis TLS URL** (`rediss://:TOKEN@HOST:PORT`). Note: Upstash's Vercel integration auto-injects `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` — the code reads `REDIS_URL`, so copy the `rediss://` connection string manually. |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob for file uploads (auto-injected when a Blob store is connected to the project) |
+| `AUTH_SECRET` | Auth.js session secret (`npx auth secret` / `openssl rand -base64 33`) |
+| `AI_GATEWAY_API_KEY` | Vercel AI Gateway key — auto via OIDC on Vercel; set this only for non-Vercel or explicit control |
+| `NEXT_PUBLIC_SITE_URL` | Public site URL (metadata + footer link). Vercel auto-domain = `https://velcora-ai-agent-p6.vercel.app` |
 
 Set these in the Vercel project dashboard **before** the first build (the build runs `tsx lib/db/migrate`, which needs `POSTGRES_URL`).
 

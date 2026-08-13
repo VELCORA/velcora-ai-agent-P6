@@ -48,7 +48,17 @@ export function Preview() {
         <div className="flex size-5 items-center justify-center rounded bg-muted/60 ring-1 ring-border/50">
           <SparklesIcon size={10} />
         </div>
-        <span className="text-[13px] text-muted-foreground">Chatbot</span>
+        <a
+          className="text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+          href={
+            process.env.NEXT_PUBLIC_SITE_URL ??
+            "https://velcora-ai-agent-p6.vercel.app"
+          }
+          rel="noreferrer"
+          target="_blank"
+        >
+          Velcora
+        </a>
       </div>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-8 px-8">

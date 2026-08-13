@@ -9,7 +9,9 @@ import { SessionProvider } from "next-auth/react";
 export const metadata: Metadata = {
   description:
     "Velcora AI Agent — Your intelligent business operations co-pilot. Qualify leads, draft emails, summarize meetings, research markets, and write proposals with AI.",
-  metadataBase: new URL("https://velcora.vercel.app"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://velcora-ai-agent-p6.vercel.app"
+  ),
   title: "Velcora AI Agent",
 };
 
