@@ -100,8 +100,33 @@ export async function POST(request: Request) {
   let requestBody: PostRequestBody;
 
   try {
-    const json = await request.json();
-    requestBody = postRequestBodySchema.parse(json);
+    const rawText = await request.text();
+    let json: any;
+    try {
+      json = JSON.parse(rawText);
+    } catch {
+      return Response.json(
+        {
+          debug: "invalid-json",
+          rawLength: rawText.length,
+          rawSample: rawText.slice(0, 300),
+        },
+        { status: 400 }
+      );
+    }
+    try {
+      requestBody = postRequestBodySchema.parse(json);
+    } catch (pe) {
+      return Response.json(
+        {
+          debug: "schema-fail",
+          error: pe instanceof Error ? pe.message : String(pe),
+          rawLength: rawText.length,
+          rawSample: rawText.slice(0, 300),
+        },
+        { status: 400 }
+      );
+    }
   } catch {
     return new ChatbotError("bad_request:api").toResponse();
   }
