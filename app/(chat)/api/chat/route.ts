@@ -67,6 +67,21 @@ function getStreamContext() {
 
 export { getStreamContext };
 
+type IncomingMessage = {
+  parts?: Array<{ type?: string; text?: string }>;
+  content?: unknown;
+};
+
+function getMessageText(msg: IncomingMessage): string {
+  if (Array.isArray(msg.parts)) {
+    return msg.parts
+      .filter((part) => part.type === "text" || part.text !== null)
+      .map((part) => part.text ?? "")
+      .join(" ");
+  }
+  return String(msg.content ?? "");
+}
+
 function synthesizeVelcoraResponse(prompt: string, modelName: string): string {
   const lower = (prompt || "").toLowerCase();
   if (
@@ -351,8 +366,8 @@ export async function POST(request: Request) {
         // "An error occurred." failure on Vercel).
         if (!hasGoogleKey) {
           markModelActive();
-          const userPrompt = String(
-            (message as { content?: unknown })?.content ?? ""
+          const userPrompt = getMessageText(
+            message as unknown as IncomingMessage
           );
           writeFallback(
             synthesizeVelcoraResponse(
