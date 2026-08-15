@@ -83,6 +83,25 @@ export default function RootLayout({
             <TooltipProvider>{children}</TooltipProvider>
           </SessionProvider>
         </ThemeProvider>
+        <footer className="border-t border-zinc-800 bg-zinc-950 py-8 px-6 text-center text-sm text-zinc-400">
+          <div className="mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6">
+            <span className="font-semibold text-zinc-200">
+              Contact Velcora AI
+            </span>
+            <a
+              className="hover:text-white transition-colors"
+              href="mailto:velcora.ai@gmail.com"
+            >
+              velcora.ai@gmail.com
+            </a>
+            <a
+              className="hover:text-white transition-colors"
+              href="tel:+919138278584"
+            >
+              +919138278584
+            </a>
+          </div>
+        </footer>
       </body>
     </html>
   );
