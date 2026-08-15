@@ -10,10 +10,19 @@ export async function GET(request: Request) {
     return Response.json({ error: "chatId required" }, { status: 400 });
   }
 
+  if (!process.env.POSTGRES_URL) {
+    return Response.json({
+      isReadonly: false,
+      messages: [],
+      userId: null,
+      visibility: "private",
+    });
+  }
+
   const [session, chat, messages] = await Promise.all([
-    auth(),
-    getChatById({ id: chatId }),
-    getMessagesByChatId({ id: chatId }),
+    auth().catch(() => null),
+    getChatById({ id: chatId }).catch(() => null),
+    getMessagesByChatId({ id: chatId }).catch(() => []),
   ]);
 
   if (!chat) {

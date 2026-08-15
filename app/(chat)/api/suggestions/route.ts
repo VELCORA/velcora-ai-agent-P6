@@ -13,15 +13,19 @@ export async function GET(request: Request) {
     ).toResponse();
   }
 
-  const session = await auth();
+  if (!process.env.POSTGRES_URL) {
+    return Response.json([], { status: 200 });
+  }
+
+  const session = await auth().catch(() => null);
 
   if (!session?.user) {
-    return new ChatbotError("unauthorized:suggestions").toResponse();
+    return Response.json([], { status: 200 });
   }
 
   const suggestions = await getSuggestionsByDocumentId({
     documentId,
-  });
+  }).catch(() => []);
 
   const [suggestion] = suggestions;
 

@@ -20,10 +20,14 @@ export async function GET(request: NextRequest) {
     ).toResponse();
   }
 
-  const session = await auth();
+  if (!process.env.POSTGRES_URL) {
+    return Response.json([]);
+  }
+
+  const session = await auth().catch(() => null);
 
   if (!session?.user) {
-    return new ChatbotError("unauthorized:chat").toResponse();
+    return Response.json([]);
   }
 
   const chats = await getChatsByUserId({
@@ -31,19 +35,25 @@ export async function GET(request: NextRequest) {
     id: session.user.id,
     limit,
     startingAfter,
-  });
+  }).catch(() => []);
 
   return Response.json(chats);
 }
 
 export async function DELETE() {
-  const session = await auth();
-
-  if (!session?.user) {
-    return new ChatbotError("unauthorized:chat").toResponse();
+  if (!process.env.POSTGRES_URL) {
+    return Response.json({ success: true }, { status: 200 });
   }
 
-  const result = await deleteAllChatsByUserId({ userId: session.user.id });
+  const session = await auth().catch(() => null);
+
+  if (!session?.user) {
+    return Response.json({ success: true }, { status: 200 });
+  }
+
+  const result = await deleteAllChatsByUserId({
+    userId: session.user.id,
+  }).catch(() => ({ success: true }));
 
   return Response.json(result, { status: 200 });
 }

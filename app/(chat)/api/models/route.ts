@@ -5,12 +5,20 @@ export async function GET() {
     "Cache-Control": "public, max-age=86400, s-maxage=86400",
   };
 
-  const curatedCapabilities = await getCapabilities();
+  const curatedCapabilities = await getCapabilities().catch(() => ({}));
 
   if (isDemo) {
-    const models = await getAllGatewayModels();
+    const models = await getAllGatewayModels().catch(() => []);
     const capabilities = Object.fromEntries(
-      models.map((m) => [m.id, curatedCapabilities[m.id] ?? m.capabilities])
+      models.map((m) => [
+        m.id,
+        (
+          curatedCapabilities as Record<
+            string,
+            { reasoning?: boolean; tools?: boolean }
+          >
+        )[m.id] ?? m.capabilities,
+      ])
     );
 
     return Response.json({ capabilities, models }, { headers });
