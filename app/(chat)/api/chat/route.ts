@@ -8,7 +8,6 @@ import {
   streamText,
   toUIMessageStream,
 } from "ai";
-import { checkBotId } from "botid/server";
 import { after } from "next/server";
 import { createResumableStreamContext } from "resumable-stream";
 import { auth, type UserType } from "@/app/(auth)/auth";
@@ -100,33 +99,8 @@ export async function POST(request: Request) {
   let requestBody: PostRequestBody;
 
   try {
-    const rawText = await request.text();
-    let json: any;
-    try {
-      json = JSON.parse(rawText);
-    } catch {
-      return Response.json(
-        {
-          debug: "invalid-json",
-          rawLength: rawText.length,
-          rawSample: rawText.slice(0, 300),
-        },
-        { status: 400 }
-      );
-    }
-    try {
-      requestBody = postRequestBodySchema.parse(json);
-    } catch (pe) {
-      return Response.json(
-        {
-          debug: "schema-fail",
-          error: pe instanceof Error ? pe.message : String(pe),
-          rawLength: rawText.length,
-          rawSample: rawText.slice(0, 300),
-        },
-        { status: 400 }
-      );
-    }
+    const json = await request.json();
+    requestBody = postRequestBodySchema.parse(json);
   } catch {
     return new ChatbotError("bad_request:api").toResponse();
   }
@@ -141,14 +115,7 @@ export async function POST(request: Request) {
       selectedMode,
     } = requestBody;
 
-    const [botIdResult, session] = await Promise.all([
-      checkBotId().catch(() => null),
-      auth().catch(() => null),
-    ]);
-
-    if (botIdResult?.isBot) {
-      return new ChatbotError("forbidden:api").toResponse();
-    }
+    const session = await auth().catch(() => null);
 
     // Zero-config mode: allow anonymous/guest usage so the chatbot works
     // without NextAuth / Postgres / Redis configured. DB-backed features

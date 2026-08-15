@@ -1,10 +1,2 @@
-import { initBotId } from "botid/client/core";
-
-initBotId({
-  protect: [
-    {
-      method: "POST",
-      path: "/api/chat",
-    },
-  ],
-});
+// BotID removed for zero-config deployment. See chat route for optional-auth fallback.
+export {};
