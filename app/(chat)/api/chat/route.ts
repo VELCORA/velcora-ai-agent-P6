@@ -552,7 +552,7 @@ export async function POST(request: Request) {
       },
       headers: {
         "x-groq-key": process.env.GROQ_API_KEY ? "set" : "missing",
-        "x-groq-model": process.env.GROQ_MODEL || "llama-3.3-70b-versatile",
+        "x-groq-model": "velcora-ai",
       },
       stream,
     });
