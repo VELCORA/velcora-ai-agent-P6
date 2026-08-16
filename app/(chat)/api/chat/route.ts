@@ -409,6 +409,7 @@ export async function POST(request: Request) {
             }
           },
           onEnd() {
+            clearTimeout(streamTimeout);
             stopWaitingStatus();
           },
           onError() {
@@ -430,34 +431,10 @@ export async function POST(request: Request) {
           tools: toolDefs,
         });
 
-        // Stream manually so we can gracefully recover from Groq errors
-        // (free-tier rate limits / overload) instead of surfacing the
-        // generic "An error occurred." to the user.
-        dataStream.write({ id: "0", type: "text-start" });
-        try {
-          for await (const delta of result.textStream) {
-            if (typeof delta === "string") {
-              dataStream.write({ delta, id: "0", type: "text-delta" });
-            }
-          }
-        } catch {
-          const userPrompt = getMessageText(
-            message as unknown as IncomingMessage
-          );
-          dataStream.write({
-            delta:
-              "\n\n_(Velcora hit a temporary limit from the model provider — please retry in a few seconds.)_\n\n" +
-              synthesizeVelcoraResponse(
-                userPrompt,
-                modelConfig?.name ?? chatModel
-              ),
-            id: "0",
-            type: "text-delta",
-          });
-        } finally {
-          clearTimeout(streamTimeout);
-          dataStream.write({ id: "0", type: "text-end" });
-        }
+        // Merge the model stream into the UI message stream — the proven
+        // template path that emits text-delta parts correctly and recovers
+        // from transient errors via maxRetries.
+        dataStream.merge(result.toUIMessageStream());
 
         if (titlePromise) {
           try {
@@ -526,7 +503,7 @@ export async function POST(request: Request) {
         ) {
           return "AI Gateway requires a valid credit card on file to service requests. Please visit https://vercel.com/d?to=%2F%5Bteam%5D%2F%7E%2Fai%3Fmodal%3Dadd-credit-card to add a card and unlock your free credits.";
         }
-        return "Oops, an error occurred!";
+        return "Velcora hit a temporary limit from the model provider — please retry in a few seconds.";
       },
       originalMessages: isToolApprovalFlow ? uiMessages : undefined,
     });
