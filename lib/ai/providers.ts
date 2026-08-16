@@ -2,7 +2,7 @@ import { groq } from "@ai-sdk/groq";
 import { customProvider } from "ai";
 import { isTestEnvironment } from "../constants";
 
-export const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+export const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.1-8b-instant";
 
 export const myProvider = isTestEnvironment
   ? (() => {

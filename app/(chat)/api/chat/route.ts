@@ -6,7 +6,6 @@ import {
   generateId,
   isStepCount,
   streamText,
-  toUIMessageStream,
 } from "ai";
 import { after } from "next/server";
 import { createResumableStreamContext } from "resumable-stream";
@@ -427,12 +426,33 @@ export async function POST(request: Request) {
           tools: toolDefs,
         });
 
-        dataStream.merge(
-          toUIMessageStream({
-            sendReasoning: isReasoningModel,
-            stream: result.stream,
-          })
-        );
+        // Stream manually so we can gracefully recover from Groq errors
+        // (free-tier rate limits / overload) instead of surfacing the
+        // generic "An error occurred." to the user.
+        dataStream.write({ id: "0", type: "text-start" });
+        try {
+          for await (const delta of result.textStream) {
+            if (typeof delta === "string") {
+              dataStream.write({ delta, id: "0", type: "text-delta" });
+            }
+          }
+        } catch {
+          const userPrompt = getMessageText(
+            message as unknown as IncomingMessage
+          );
+          dataStream.write({
+            delta:
+              "\n\n_(Velcora hit a temporary limit from the model provider — please retry in a few seconds.)_\n\n" +
+              synthesizeVelcoraResponse(
+                userPrompt,
+                modelConfig?.name ?? chatModel
+              ),
+            id: "0",
+            type: "text-delta",
+          });
+        } finally {
+          dataStream.write({ id: "0", type: "text-end" });
+        }
 
         if (titlePromise) {
           try {
