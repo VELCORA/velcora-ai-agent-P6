@@ -377,7 +377,10 @@ export async function POST(request: Request) {
           return;
         }
 
+        const streamAbort = new AbortController();
+        const streamTimeout = setTimeout(() => streamAbort.abort(), 25_000);
         const result = streamText({
+          abortSignal: streamAbort.signal,
           activeTools: enableTools
             ? isReasoningModel && !supportsTools
               ? []
@@ -394,6 +397,7 @@ export async function POST(request: Request) {
             requestHints,
             supportsTools,
           }),
+          maxRetries: 2,
           messages: modelMessages,
           model: getLanguageModel(chatModel),
           onAbort() {
@@ -451,6 +455,7 @@ export async function POST(request: Request) {
             type: "text-delta",
           });
         } finally {
+          clearTimeout(streamTimeout);
           dataStream.write({ id: "0", type: "text-end" });
         }
 
