@@ -139,7 +139,10 @@ export async function POST(request: Request) {
       type: "guest" as UserType,
     };
     const hasDb = Boolean(process.env.POSTGRES_URL);
-    const enableTools = hasDb;
+    // Tools (document/weather) require extra API keys + DB and add failure
+    // surface on the free Groq tier. Keep the chatbot a pure text agent until
+    // those integrations are explicitly wired up.
+    const enableTools = false;
 
     const chatModel = allowedModelIds.has(selectedChatModel)
       ? selectedChatModel
@@ -434,7 +437,12 @@ export async function POST(request: Request) {
         // Merge the model stream into the UI message stream — the proven
         // template path that emits text-delta parts correctly and recovers
         // from transient errors via maxRetries.
-        dataStream.merge(result.toUIMessageStream());
+        dataStream.merge(
+          result.toUIMessageStream({
+            onError: () =>
+              "Velcora hit a temporary limit from the model provider — please retry in a few seconds.",
+          })
+        );
 
         if (titlePromise) {
           try {
