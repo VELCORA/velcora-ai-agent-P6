@@ -439,8 +439,9 @@ export async function POST(request: Request) {
         // from transient errors via maxRetries.
         dataStream.merge(
           result.toUIMessageStream({
-            onError: () =>
-              "Velcora hit a temporary limit from the model provider — please retry in a few seconds.",
+            onError: (error) =>
+              "DEBUG_ERR: " +
+              (error instanceof Error ? error.message : JSON.stringify(error)),
           })
         );
 
