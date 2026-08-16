@@ -439,9 +439,14 @@ export async function POST(request: Request) {
         // from transient errors via maxRetries.
         dataStream.merge(
           result.toUIMessageStream({
-            onError: (error) =>
-              "DEBUG_ERR: " +
-              (error instanceof Error ? error.message : JSON.stringify(error)),
+            onError: (error) => {
+              const msg =
+                error instanceof Error ? error.message : String(error);
+              if (/invalid api key|unauthorized|authentication/i.test(msg)) {
+                return "Velcora AI isn't configured yet — the model provider key is missing or invalid. Please set a valid GROQ_API_KEY.";
+              }
+              return "Velcora hit a temporary limit from the model provider — please retry in a few seconds.";
+            },
           })
         );
 
