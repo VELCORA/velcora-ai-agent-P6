@@ -82,7 +82,7 @@ function getMessageText(msg: IncomingMessage): string {
   return String(msg.content ?? "");
 }
 
-function synthesizeVelcoraResponse(prompt: string, modelName: string): string {
+function synthesizeVelcoraResponse(prompt: string, _modelName: string): string {
   const lower = (prompt || "").toLowerCase();
   if (
     lower.includes("sla") ||
@@ -107,7 +107,7 @@ function synthesizeVelcoraResponse(prompt: string, modelName: string): string {
   ) {
     return "**Velcora AI — Security**\n\nSOC2-aligned, zero-retention by default: conversation payloads are processed in ephemeral memory and never stored at rest. 256-bit AES + TLS 1.3.";
   }
-  return `**Velcora AI Agent** (${modelName})\n\nI'm running in zero-config fallback mode. Add \`GOOGLE_GENERATIVE_AI_API_KEY\` in your Vercel project to enable live Gemini responses.\n\nI received: "${prompt.slice(0, 140)}". I can help with knowledge retrieval, chat orchestration, and conversation triage — ask me anything.`;
+  return `**Velcora AI Agent**\n\nI'm running in zero-config fallback mode. Add \`GROQ_API_KEY\` in your Vercel project to enable live AI responses.\n\nI received: "${prompt.slice(0, 140)}". I can help with knowledge retrieval, chat orchestration, and conversation triage — ask me anything.`;
 }
 
 export async function POST(request: Request) {
@@ -353,7 +353,7 @@ export async function POST(request: Request) {
             }
           : undefined;
 
-        const hasGoogleKey = Boolean(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
+        const hasGroqKey = Boolean(process.env.GROQ_API_KEY);
 
         const writeFallback = (text: string) => {
           dataStream.write({ id: "0", type: "text-start" });
@@ -364,7 +364,7 @@ export async function POST(request: Request) {
         // Zero-config fallback: when no model API key is configured, stream a
         // synthesized Velcora response instead of throwing (the previous
         // "An error occurred." failure on Vercel).
-        if (!hasGoogleKey) {
+        if (!hasGroqKey) {
           markModelActive();
           const userPrompt = getMessageText(
             message as unknown as IncomingMessage

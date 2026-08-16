@@ -1,7 +1,8 @@
-import { google } from "@ai-sdk/google";
-import { customProvider, gateway } from "ai";
+import { groq } from "@ai-sdk/groq";
+import { customProvider } from "ai";
 import { isTestEnvironment } from "../constants";
-import { titleModel } from "./models";
+
+export const GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 
 export const myProvider = isTestEnvironment
   ? (() => {
@@ -18,30 +19,18 @@ export const myProvider = isTestEnvironment
     })()
   : null;
 
-export function getLanguageModel(modelId: string) {
+// All production traffic routes through our Groq-backed Velcora model.
+// The real underlying model is never exposed to the client.
+export function getLanguageModel(_modelId: string) {
   if (isTestEnvironment && myProvider) {
-    return myProvider.languageModel(modelId);
+    return myProvider.languageModel("chat-model");
   }
-
-  if (modelId.startsWith("google/") || modelId.startsWith("models/")) {
-    const strippedId = modelId.replace("google/", "");
-    return google(strippedId);
-  }
-
-  return gateway.languageModel(modelId);
+  return groq(GROQ_MODEL);
 }
 
 export function getTitleModel() {
   if (isTestEnvironment && myProvider) {
     return myProvider.languageModel("title-model");
   }
-
-  if (
-    titleModel.id.startsWith("google/") ||
-    titleModel.id.startsWith("models/")
-  ) {
-    const strippedId = titleModel.id.replace("google/", "");
-    return google(strippedId);
-  }
-  return gateway.languageModel(titleModel.id);
+  return groq(GROQ_MODEL);
 }

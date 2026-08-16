@@ -1,11 +1,10 @@
-export const DEFAULT_CHAT_MODEL = "google/gemini-2.5-flash";
+export const DEFAULT_CHAT_MODEL = "velcora-ai";
 
 export const titleModel = {
-  description: "Fast model for title generation",
-  gatewayOrder: ["fireworks", "bedrock"],
-  id: "moonshotai/kimi-k2.5",
-  name: "Kimi K2.5",
-  provider: "moonshotai",
+  description: "Velcora's autonomous operations model",
+  id: "velcora-ai",
+  name: "Velcora AI",
+  provider: "velcora",
 };
 
 export type ModelCapabilities = {
@@ -25,47 +24,10 @@ export type ChatModel = {
 
 export const chatModels: ChatModel[] = [
   {
-    description: "Fast and capable model with tool use",
-    gatewayOrder: ["bedrock", "deepinfra"],
-    id: "deepseek/deepseek-v3.2",
-    name: "DeepSeek V3.2",
-    provider: "deepseek",
-  },
-  {
-    description: "Google's fast, capable, and multimodal model",
-    id: "google/gemini-2.5-flash",
-    name: "Gemini 2.5 Flash",
-    provider: "google",
-  },
-  {
-    description: "Moonshot AI flagship model",
-    gatewayOrder: ["fireworks", "bedrock"],
-    id: "moonshotai/kimi-k2.5",
-    name: "Kimi K2.5",
-    provider: "moonshotai",
-  },
-  {
-    description: "Compact reasoning model",
-    gatewayOrder: ["groq", "bedrock"],
-    id: "openai/gpt-oss-20b",
-    name: "GPT OSS 20B",
-    provider: "openai",
-    reasoningEffort: "low",
-  },
-  {
-    description: "Open-source 120B parameter model",
-    gatewayOrder: ["fireworks", "bedrock"],
-    id: "openai/gpt-oss-120b",
-    name: "GPT OSS 120B",
-    provider: "openai",
-    reasoningEffort: "low",
-  },
-  {
-    description: "Fast non-reasoning model with tool use",
-    gatewayOrder: ["xai"],
-    id: "xai/grok-4.1-fast-non-reasoning",
-    name: "Grok 4.1 Fast",
-    provider: "xai",
+    description: "Velcora's autonomous operations co-pilot",
+    id: "velcora-ai",
+    name: "Velcora AI",
+    provider: "velcora",
   },
 ];
 
@@ -74,13 +36,13 @@ export async function getCapabilities(): Promise<
 > {
   const results = await Promise.all(
     chatModels.map(async (model) => {
-      if (model.provider === "google") {
+      if (model.provider === "velcora") {
         return [
           model.id,
           {
             reasoning: false,
             tools: true,
-            vision: true,
+            vision: false,
           },
         ];
       }
